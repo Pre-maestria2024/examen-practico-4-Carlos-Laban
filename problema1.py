@@ -28,5 +28,3 @@ d = [10, 8, 10, 10, 2, 1]
 # Salida esperada: 39
 dinero_max = max_dollars(m, n, h, d)
 print(dinero_max)
-
-
