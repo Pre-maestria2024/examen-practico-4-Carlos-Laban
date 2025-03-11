@@ -1,30 +1,48 @@
-def max_dollars(m, n, h, d):
-    # dp[i][j] representa la máxima cantidad de dólares que se puede obtener 
-    # usando los primeros i alimentos y alcanzando un nivel de salud j
-    dp = [[-1] * (n + 1) for _ in range(m + 1)]
-    dp[0][0] = 0  # Caso base: 0 dólares si no se ha comido nada y la salud es 0
-    
-    for i in range(1, m + 1):
-        for j in range(n + 1):
-            # Opción 1: No tomar el alimento i
-            dp[i][j] = dp[i - 1][j]
-            
-            # Opción 2: Comer el alimento i (si cabe en la salud máxima)
-            if j - h[i - 1] >= 0 and dp[i - 1][j - h[i - 1]] != -1:
-                dp[i][j] = max(dp[i][j], dp[i - 1][j - h[i - 1]])
-            
-            # Opción 3: Vender el alimento i si la salud ya es máxima
-            if j == n and dp[i - 1][j] != -1:
-                dp[i][j] = max(dp[i][j], dp[i - 1][j] + d[i - 1])
-    
-    return dp[m][n] if dp[m][n] != -1 else 0
+def main():
+    import sys
+    data = sys.stdin.read().strip().split()
+    if not data:
+        return
+   
+    m, n = map(int, data[:2])
+    H = list(map(int, data[2:2+m]))           # h_i
+    D = list(map(int, data[2+m:2+2*m]))       # d_i
+   
+    total_d = sum(D)
+   
 
-# Entrada de ejemplo
-m = 6
-n = 100
-h = [1, 1, 1, 1, 100, 99]
-d = [10, 8, 10, 10, 2, 1]
+    if n == 0:
+        print(total_d)
+        return
+   
+    INF = 10**15
+    dp = [INF] * (n+1)
+    dp[0] = 0
+   
+    for i in range(m):
+        hi, di = H[i], D[i]
+       
+        new_dp = dp[:]
+       
+        for k in range(n+1):
+            if dp[k] == INF:
+                continue  # no se puede alcanzar esta salud, omitir
+           
+            nk = min(n, k + hi)   # nueva salud
+            cost = dp[k] + di    # costo acumulado al comer este alimento
+            if cost < new_dp[nk]:
+                new_dp[nk] = cost
+       
+        dp = new_dp
+   
 
-# Salida esperada: 39
-dinero_max = max_dollars(m, n, h, d)
-print(dinero_max)
+    if dp[n] == INF or dp[n] > total_d:
+        answer = 0
+    else:
+        answer = total_d - dp[n]
+   
+    print(answer)
+
+
+if __name__ == '__main__':
+    main()
